@@ -2,6 +2,7 @@ Hardkernel LCD+IO Shield using RPi.GPIO & RPLCD library
 
 sudo pip3 install RPLCD
 
+```
 LCD+IO Shiled pin map for RPi.GPIO GPIO.BOARD numbering
 LCD Pin
 4/RS  8
@@ -24,3 +25,4 @@ D5    36
 SW (Active Low)
 SW1   18
 SW2   22
+```
