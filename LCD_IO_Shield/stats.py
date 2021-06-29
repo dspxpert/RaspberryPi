@@ -59,14 +59,16 @@ lcd.clear()
 lcd.cursor_pos = (0, 0)
 lcd.write_string('Hello world')
 
-whie True:
+while True:
     cmd = "free -m | awk 'NR==2{printf \"Mem:  %.0f%% %s/%s M\", $3*100/$2, $3,$2 }'"
     MemUsage = subprocess.check_output(cmd, shell=True)
     cmd = "df -h | awk '$NF==\"/\"{printf \"Disk: %d/%dGB %s\", $3,$2,$5}'"
     Disk = subprocess.check_output(cmd, shell=True) 
     
     lcd.write_string(f"{get_ip_address('eth0')}")
-    lcd.write_string(f"{MemUsage}, {Disk}")
+    lcd.write_string(f"{MemUsage.decode()}, {Disk.decode()}")
+    print(f"{get_ip_address('eth0')}")
+    print(f"{MemUsage.decode()}, {Disk.decode()}")
     time.sleep(0.25)
 
 try:
