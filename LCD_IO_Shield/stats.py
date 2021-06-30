@@ -20,7 +20,8 @@ def get_ip_address(interface):
 
 def get_cpu_usage():
     # Shell scripts for system monitoring from here : https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
-    cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
+    #cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
+    cmd = "top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-2)}'"
     CPU = subprocess.check_output(cmd, shell=True)
     return CPU
 
@@ -60,11 +61,14 @@ lcd.cursor_pos = (0, 0)
 lcd.write_string('Hello world')
 
 while True:
+    #cmd = "free -m | awk 'NR==2{printf \"Mem:  %.0f%% %s/%s M\", $3*100/$2, $3,$2 }'"
     cmd = "free -m | awk 'NR==2{printf \"Mem:  %.0f%% %s/%s M\", $3*100/$2, $3,$2 }'"
     MemUsage = subprocess.check_output(cmd, shell=True)
+    #cmd = "df -h | awk '$NF==\"/\"{printf \"Disk: %d/%dGB %s\", $3,$2,$5}'"
     cmd = "df -h | awk '$NF==\"/\"{printf \"Disk: %d/%dGB %s\", $3,$2,$5}'"
     Disk = subprocess.check_output(cmd, shell=True) 
     
+    cpuload = float(get_cpu_usage())*100/4
     lcd.write_string(f"{get_ip_address('eth0')}")
     lcd.write_string(f"{MemUsage.decode()}, {Disk.decode()}")
     print(f"{get_ip_address('eth0')}")
