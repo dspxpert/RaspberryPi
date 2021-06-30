@@ -67,7 +67,11 @@ time.sleep(0.5)
 lcd.cursor_pos = (0, 0)
 lcd.write_string('Hello world')
 '''
+LED1_state = 0
+LED2_state = 0
 LED5_state = 0
+button1_prev = 1
+button2_prev = 1
 while True:
     #cmd = "free -m | awk 'NR==2{printf \"Mem:  %.0f%% %s/%s M\", $3*100/$2, $3,$2 }'"
     cmd = "free -m | awk 'NR==2{printf \"%.0f%%\", $3*100/$2 }'"
@@ -86,16 +90,25 @@ while True:
     
     button1 = GPIO.input(SW1)
     button2 = GPIO.input(SW2)
-    if button1 == 0:
-        print('button1 pressed')
-        GPIO.output(LED1, GPIO.HIGH)
-    else:
+    if button1 == 0 and button2 == 0:
         GPIO.output(LED1, GPIO.LOW)
-    if button2 == 0:
-        print('button2 pressed')
-        break    
+        GPIO.output(LED2, GPIO.LOW)
+        GPIO.output(LED5, GPIO.LOW)
+        lcd.clear()
+        break
+
+    if button1 == 0 and button1_prev == 1:
+        LED1_state ^=1
+        GPIO.output(LED1, LED1_state)
+    button1_prev = button1    
+
+    if button2 == 0 and button2_prev == 1:
+        LED2_state ^=1
+        GPIO.output(LED2, LED2_state)
+    button2_prev = button2
+
     LED5_state ^=1
     GPIO.output(LED5, LED5_state)
-    time.sleep(0.25)
+    time.sleep(0.2)
 
 GPIO.cleanup() 
