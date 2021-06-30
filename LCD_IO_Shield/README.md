@@ -1,12 +1,23 @@
+## ODROID 16x2 LCD + IO Shield
+
+Product Page
+
+https://www.hardkernel.com/shop/16x2-lcd-io-shield/
+
+Wiki Page
+
+https://wiki.odroid.com/accessory/display/16x2_lcd_io_shield/16x2_lcd_io_shield
+
+
 Hardkernel LCD+IO Shield using RPi.GPIO & RPLCD library
-
+```
 sudo pip3 install RPLCD
-
+```
 
 LCD+IO Shield pin map for RPi.GPIO (GPIO.BOARD numbering mode)
 ```
 LCD Pins
-4/RS  8
+4/RS  7
 6/E   11
 5/RW  None
 11/D4 13
