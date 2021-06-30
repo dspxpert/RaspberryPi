@@ -62,11 +62,12 @@ lcd = CharLCD(pin_rs=LCD_RS, pin_e=LCD_E, pins_data=[LCD_D4, LCD_D5, LCD_D6, LCD
               charmap='A02',
               auto_linebreaks=True)
 lcd.clear()
+time.sleep(0.5)
 '''
 lcd.cursor_pos = (0, 0)
 lcd.write_string('Hello world')
 '''
-
+LED5_state = 0
 while True:
     #cmd = "free -m | awk 'NR==2{printf \"Mem:  %.0f%% %s/%s M\", $3*100/$2, $3,$2 }'"
     cmd = "free -m | awk 'NR==2{printf \"%.0f%%\", $3*100/$2 }'"
@@ -93,7 +94,8 @@ while True:
     if button2 == 0:
         print('button2 pressed')
         break    
-
+    LED5_state ^=1
+    GPIO.output(LED5, LED5_state)
     time.sleep(0.25)
 
 GPIO.cleanup() 
