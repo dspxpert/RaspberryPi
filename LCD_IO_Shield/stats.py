@@ -95,6 +95,9 @@ while True:
         GPIO.output(LED2, GPIO.LOW)
         GPIO.output(LED5, GPIO.LOW)
         lcd.clear()
+        lcd.cursor_pos = (0, 0)
+        lcd.write_string('Good Bye!')
+        subprecess.check_output('sudo poweroff', shell=True)
         break
 
     if button1 == 0 and button1_prev == 1:
