@@ -1,35 +1,12 @@
 #!/usr/bin/python3
-#sudo pip3 install RPLCD
+# to install RPLCD, sudo pip3 install RPLCD
 
 import RPi.GPIO as GPIO
 from RPLCD.gpio import CharLCD
 import time
 import subprocess
 
-def get_network_interface_state(interface):
-    try:
-        return subprocess.check_output('cat /sys/class/net/%s/operstate' % interface, shell=True).decode('ascii')[:-1]
-    except:
-        return 'down'
-
-def get_ip_address(interface):
-    if get_network_interface_state(interface) == 'down':
-        return None
-    cmd = "ifconfig %s | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'" % interface
-    try:
-        return subprocess.check_output(cmd, shell=True).decode('ascii')[:-1]
-    except:
-        return None
-
-# Return a string representing the percentage of CPU in use
-
-def get_cpu_usage():
-    # Shell scripts for system monitoring from here : https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
-    #cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
-    cmd = "top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-2)}'"
-    CPU = subprocess.check_output(cmd, shell=True)
-    return CPU
-
+# Hardkernel LCD+IO Shield Pin definition for RPi.GPIO GPIO.BOARD numbering mode
 LCD_RS = 7
 LCD_E  = 11
 LCD_RW = None
@@ -49,6 +26,28 @@ LED5 = 36
 SW1 = 18
 SW2 = 22
 
+def get_network_interface_state(interface):
+    try:
+        return subprocess.check_output('cat /sys/class/net/%s/operstate' % interface, shell=True).decode('ascii')[:-1]
+    except:
+        return 'down'
+
+def get_ip_address(interface):
+    if get_network_interface_state(interface) == 'down':
+        return None
+    cmd = "ifconfig %s | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1'" % interface
+    try:
+        return subprocess.check_output(cmd, shell=True).decode('ascii')[:-1]
+    except:
+        return None
+
+def get_cpu_usage():
+    # Shell scripts for system monitoring from here : https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
+    #cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
+    cmd = "top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-2)}'"
+    CPU = subprocess.check_output(cmd, shell=True)
+    return CPU
+
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
 
@@ -61,17 +60,16 @@ lcd = CharLCD(pin_rs=LCD_RS, pin_e=LCD_E, pins_data=[LCD_D4, LCD_D5, LCD_D6, LCD
               cols=16, rows=2, dotsize=8,
               charmap='A02',
               auto_linebreaks=True)
+
 lcd.clear()
 time.sleep(0.5)
-'''
-lcd.cursor_pos = (0, 0)
-lcd.write_string('Hello world')
-'''
+
 LED1_state = 0
 LED2_state = 0
 LED5_state = 0
 button1_prev = 1
 button2_prev = 1
+
 while True:
     #cmd = "free -m | awk 'NR==2{printf \"Mem:  %.0f%% %s/%s M\", $3*100/$2, $3,$2 }'"
     cmd = "free -m | awk 'NR==2{printf \"%.0f%%\", $3*100/$2 }'"
@@ -114,4 +112,4 @@ while True:
     GPIO.output(LED5, LED5_state)
     time.sleep(0.2)
 
-GPIO.cleanup() 
+GPIO.cleanup()
