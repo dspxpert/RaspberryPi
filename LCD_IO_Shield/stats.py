@@ -5,6 +5,7 @@ import RPi.GPIO as GPIO
 from RPLCD.gpio import CharLCD
 import time
 import subprocess
+import threading
 
 # Hardkernel LCD+IO Shield Pin definition for RPi.GPIO GPIO.BOARD numbering mode
 LCD_RS = 7
@@ -25,6 +26,19 @@ LED5 = 36
 
 SW1 = 18
 SW2 = 22
+
+GPIO.setmode(GPIO.BOARD)
+GPIO.setwarnings(False)
+
+GPIO.setup([LED1, LED2, LED3, LED4, LED5, LED6, LED7], GPIO.OUT, initial=GPIO.LOW)
+GPIO.setup([SW1, SW2], GPIO.IN, pull_up_down=GPIO.PUD_UP)
+
+#lcd = CharLCD(pin_rs=LCD_RS, pin_rw=LCD_RW, pin_e=LCD_E, pins_data=[LCD_D4, LCD_D5, LCD_D6, LCD_D7],
+lcd = CharLCD(pin_rs=LCD_RS, pin_e=LCD_E, pins_data=[LCD_D4, LCD_D5, LCD_D6, LCD_D7],
+              numbering_mode=GPIO.BOARD,
+              cols=16, rows=2, dotsize=8,
+              charmap='A02',
+              auto_linebreaks=True)
 
 def get_network_interface_state(interface):
     try:
@@ -56,29 +70,8 @@ def cpu_temp():
     with open('/sys/class/thermal/thermal_zone0/temp', 'r') as infile:
         return (f"{float(infile.read())*1e-3:4.1f}'C") 
 
-GPIO.setmode(GPIO.BOARD)
-GPIO.setwarnings(False)
-
-GPIO.setup([LED1, LED2, LED3, LED4, LED5, LED6, LED7], GPIO.OUT, initial=GPIO.LOW)
-GPIO.setup([SW1, SW2], GPIO.IN, pull_up_down=GPIO.PUD_UP)
-
-#lcd = CharLCD(pin_rs=LCD_RS, pin_rw=LCD_RW, pin_e=LCD_E, pins_data=[LCD_D4, LCD_D5, LCD_D6, LCD_D7],
-lcd = CharLCD(pin_rs=LCD_RS, pin_e=LCD_E, pins_data=[LCD_D4, LCD_D5, LCD_D6, LCD_D7],
-              numbering_mode=GPIO.BOARD,
-              cols=16, rows=2, dotsize=8,
-              charmap='A02',
-              auto_linebreaks=True)
-
-lcd.clear()
-time.sleep(0.5)
-
-LED1_state = 0
-LED2_state = 0
-LED5_state = 0
-button1_prev = 1
-button2_prev = 1
-
-while True:
+def lcd_update_timer():
+    threading.Timer(1.0, lcd_update_timer).start()
     #cmd = "free -m | awk 'NR==2{printf \"Mem:  %.0f%% %s/%s M\", $3*100/$2, $3,$2 }'"
     cmd = "free -m | awk 'NR==2{printf \"%.0f%%\", $3*100/$2 }'"
     MemUsage = subprocess.check_output(cmd, shell=True)
@@ -91,13 +84,24 @@ while True:
         interface = 'eth0'
     else:
         interface = 'wlan0'
-        
+    
     lcd.cursor_pos = (0, 0)
     lcd.write_string(f"{interface:<5}{cpu_temp():>7}{cpuload:>3}%"[0:16])
-    
+
     lcd.cursor_pos = (1, 0)
     lcd.write_string(f"{str(get_ip_address(interface)):<12}{MemUsage.decode():>4}"[0:16])
-    
+
+LED1_state = 0
+LED2_state = 0
+LED5_state = 0
+button1_prev = 1
+button2_prev = 1
+
+lcd.clear()
+time.sleep(0.5)
+lcd_update_timer()
+
+while True:    
     button1 = GPIO.input(SW1)
     button2 = GPIO.input(SW2)
     if button1 == 0 and button2 == 0:
@@ -124,6 +128,6 @@ while True:
 
     LED5_state ^=1
     GPIO.output(LED5, LED5_state)
-    time.sleep(0.2)
+    time.sleep(0.1)
 
 GPIO.cleanup()
