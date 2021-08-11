@@ -50,18 +50,17 @@ while True:
     #cmd = "df -h | awk '$NF==\"/\"{printf \"Disk: %d/%dGB %s\", $3, $2, $5}'"
     cmd = "df -h | awk '$NF==\"/\"{printf \"D:%d/%dGB\", $3,$2}'"
     Disk = subprocess.check_output(cmd, shell=True) 
-
     cpuload = int(float(get_cpu_usage().decode())*100/4)
       
-    lcd.cursor_pos = (0, 0)
     if get_ip_address('wlan0') == None:
-        lcd.write_string(f"{str(get_ip_address('eth0')):>12}{cpuload:>3}%")
         interface = 'eth0'
     else:
-        lcd.write_string(f"{str(get_ip_address('wlan0')):>12}{cpuload:>3}%")
         interface = 'wlan0'
-
+        
+    lcd.cursor_pos = (0, 0)
+    lcd.write_string(f"{interface:<5}{cpu_temp():>7}{cpuload:>3}%")
+    
     lcd.cursor_pos = (1, 0)
-    lcd.write_string(f"{interface:<5}{cpu_temp():>7}{MemUsage.decode():>4}")
+    lcd.write_string(f"{str(get_ip_address(interface)):<12}{MemUsage.decode():>4}")
     
     time.sleep(0.2)
