@@ -5,6 +5,9 @@
 from RPLCD.i2c import CharLCD
 import time
 import subprocess
+import threading
+
+lcd = CharLCD('PCF8574', 0x3f)
 
 def get_network_interface_state(interface):
     try:
@@ -36,14 +39,8 @@ def cpu_temp():
     with open('/sys/class/thermal/thermal_zone0/temp', 'r') as infile:
         return (f"{float(infile.read())*1e-3:4.1f}'C") 
 
-
-lcd = CharLCD('PCF8574', 0x3f)
-
-lcd.clear()
-time.sleep(0.5)
-
-
-while True:
+def lcd_update_timer():
+    threading.Timer(1.0, lcd_update_timer).start()
     #cmd = "free -m | awk 'NR==2{printf \"Mem:  %.0f%% %s/%s M\", $3*100/$2, $3,$2 }'"
     cmd = "free -m | awk 'NR==2{printf \"%.0f%%\", $3*100/$2 }'"
     MemUsage = subprocess.check_output(cmd, shell=True)
@@ -51,16 +48,18 @@ while True:
     cmd = "df -h | awk '$NF==\"/\"{printf \"D:%d/%dGB\", $3,$2}'"
     Disk = subprocess.check_output(cmd, shell=True) 
     cpuload = int(float(get_cpu_usage().decode())*100/4)
-      
+    
     if get_ip_address('wlan0') == None:
         interface = 'eth0'
     else:
         interface = 'wlan0'
-        
+    
     lcd.cursor_pos = (0, 0)
     lcd.write_string(f"{interface:<5}{cpu_temp():>7}{cpuload:>3}%"[0:16])
-    
+
     lcd.cursor_pos = (1, 0)
     lcd.write_string(f"{str(get_ip_address(interface)):<12}{MemUsage.decode():>4}"[0:16])
-    
-    time.sleep(0.2)
+ 
+lcd.clear()
+time.sleep(1.0)
+lcd_update_timer()
