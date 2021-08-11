@@ -93,10 +93,10 @@ while True:
         interface = 'wlan0'
         
     lcd.cursor_pos = (0, 0)
-    lcd.write_string(f"{interface:<5}{cpu_temp():>7}{cpuload:>3}%")
+    lcd.write_string(f"{interface:<5}{cpu_temp():>7}{cpuload:>3}%"[0:16])
     
     lcd.cursor_pos = (1, 0)
-    lcd.write_string(f"{str(get_ip_address(interface)):<12}{MemUsage.decode():>4}")
+    lcd.write_string(f"{str(get_ip_address(interface)):<12}{MemUsage.decode():>4}"[0:16])
     
     button1 = GPIO.input(SW1)
     button2 = GPIO.input(SW2)
