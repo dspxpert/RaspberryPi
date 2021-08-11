@@ -43,10 +43,18 @@ def get_ip_address(interface):
 
 def get_cpu_usage():
     # Shell scripts for system monitoring from here : https://unix.stackexchange.com/questions/119126/command-to-display-memory-usage-disk-usage-and-cpu-load
-    #cmd = "top -bn1 | grep load | awk '{printf \"CPU Load: %.2f\", $(NF-2)}'"
     cmd = "top -bn1 | grep load | awk '{printf \"%.2f\", $(NF-2)}'"
     CPU = subprocess.check_output(cmd, shell=True)
     return CPU
+
+def get_cpu_temp():
+    cmd = "/opt/vc/bin/vcgencmd measure_temp"
+    TEMP = subprocess.check_output(cmd, shell=True)
+    return TEMP
+
+def cpu_temp():
+    with open('/sys/class/thermal/thermal_zone0/temp', 'r') as infile:
+        return (f"{float(infile.read())*1e-3:4.1f}'C") 
 
 GPIO.setmode(GPIO.BOARD)
 GPIO.setwarnings(False)
@@ -79,12 +87,17 @@ while True:
     Disk = subprocess.check_output(cmd, shell=True) 
 
     cpuload = int(float(get_cpu_usage().decode())*100/4)
+      
     lcd.cursor_pos = (0, 0)
-    lcd.write_string(f"{str(get_ip_address('eth0')):<12}{cpuload:>3}%")
+    if get_ip_address('wlan0') == None:
+        lcd.write_string(f"{str(get_ip_address('eth0')):<12}{cpuload:>3}%")
+        interface = ' eth0'
+    else:
+        lcd.write_string(f"{str(get_ip_address('wlan0')):<12}{cpuload:>3}%")
+        interface = 'wlan0'
+
     lcd.cursor_pos = (1, 0)
-    lcd.write_string(f"{str(get_ip_address('wlan0')):<12}{MemUsage.decode():>4}")
-    #print(f"{str(get_ip_address('eth0')):<12}{cpuload:>3}%")
-    #print(f"{str(get_ip_address('wlan0')):<12}{MemUsage.decode():>4}")
+    lcd.write_string(f"{interface} {cpu_temp():>6}{MemUsage.decode():>4}")
     
     button1 = GPIO.input(SW1)
     button2 = GPIO.input(SW2)
