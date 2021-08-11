@@ -107,6 +107,8 @@ while True:
         GPIO.output(LED5, GPIO.LOW)
         lcd.clear()
         lcd.cursor_pos = (0, 0)
+        lcd.write_string('System Poweroff.')
+        lcd.cursor_pos = (1, 0)
         lcd.write_string('Good Bye!')
         subprecess.check_output('sudo poweroff', shell=True)
         break
