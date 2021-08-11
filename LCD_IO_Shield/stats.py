@@ -98,7 +98,7 @@ button1_prev = 1
 button2_prev = 1
 
 lcd.clear()
-time.sleep(0.5)
+time.sleep(1.0)
 lcd_update_timer()
 
 while True:    
