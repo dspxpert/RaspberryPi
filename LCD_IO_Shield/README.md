@@ -40,7 +40,7 @@ SW2   22
 ```
 
 Auto run at Booting
-'''
+```
 vi ~/.profile
 /usr/bin/python3 /home/pi/Documents/stats.py &
-'''
+```
