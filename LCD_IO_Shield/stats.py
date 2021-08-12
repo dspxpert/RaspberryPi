@@ -106,6 +106,7 @@ while True:
     button2 = GPIO.input(SW2)
     if button1 == 0 and button2 == 0:
         threading.Timer(1.0, lcd_update_timer).cancel()
+        time.sleep(1.5)
         GPIO.output(LED1, GPIO.LOW)
         GPIO.output(LED2, GPIO.LOW)
         GPIO.output(LED5, GPIO.LOW)
