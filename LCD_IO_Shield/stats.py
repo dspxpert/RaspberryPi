@@ -105,19 +105,19 @@ while True:
     button1 = GPIO.input(SW1)
     button2 = GPIO.input(SW2)
     if button1 == 0 and button2 == 0:
-        time.sleep(1.5)
-        if (GPIO.input(SW1) or GPIO.input(SW2)) != 0:
-          continue
+        time.sleep(1.0)
+        if GPIO.input(SW1) == 1 or GPIO.input(SW2) == 1:
+            continue
         threading.Timer(1.0, lcd_update_timer).cancel()
-        time.sleep(1.5)
+        time.sleep(2.0)
         GPIO.output(LED1, GPIO.LOW)
         GPIO.output(LED2, GPIO.LOW)
         GPIO.output(LED5, GPIO.LOW)
-        lcd.clear()
+        
         lcd.cursor_pos = (0, 0)
-        lcd.write_string('System Poweroff.')
+        lcd.write_string(f'{"System Poweroff.":<16}')
         lcd.cursor_pos = (1, 0)
-        lcd.write_string('Good Bye!')
+        lcd.write_string(f'{"Good Bye!":<16}')
         subprecess.check_output('sudo poweroff', shell=True)
         break
 
