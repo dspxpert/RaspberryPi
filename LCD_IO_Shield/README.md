@@ -49,7 +49,9 @@ vi ~/.profile
 For C language
 https://wiki.odroid.com/accessory/display/16x2_lcd_io_shield/c/start
 
+```
 sudo apt install wiringpi
 wget https://dn.odroid.com/source_peripherals/16x2lcdio/example-lcd.c
 gcc -o example-lcd example-lcd.c -lwiringPi -lwiringPiDev -lm -lpthread -lrt -lcrypt
 sudo ./example-lcd
+```
