@@ -47,7 +47,9 @@ vi ~/.profile
 
 
 For C language
+
 https://wiki.odroid.com/accessory/display/16x2_lcd_io_shield/c/start
+
 
 ```
 sudo apt install wiringpi
